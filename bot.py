@@ -71,12 +71,12 @@ def send_current_schedule(update: Update, context: CallbackContext) -> None:
 
 def send_next_schedule(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("The feature is in development...")
-    # user_id = update.message.from_user.id
-    # if user_id in user_groups:
-    #     group_number = user_groups[user_id]
-    #     pars_func.send_n_schedule(update, user_groups, user_id)
-    # else:
-    #     update.message.reply_text("First, set your group number with the 'Change group' command.")
+    user_id = update.message.from_user.id
+    if user_id in user_groups:
+        group_number = user_groups[user_id]
+        pars_func.send_n_schedule(update, user_groups, user_id)
+    else:
+        update.message.reply_text("First, set your group number with the 'Change group' command.")
 
 def main():
 
