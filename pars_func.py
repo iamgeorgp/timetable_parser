@@ -1,4 +1,5 @@
 import os
+import time
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
@@ -26,13 +27,11 @@ driver_path = os.path.join(script_directory, "msedgedriver")
 # Создаем объект Service с указанием пути к файлу драйвера
 service = Service(driver_path)
 options = Options()
+# options.add_argument('--headless')
 
 global driver
 
 
-
-def hihi():
-    print('YOOOOOOOOOOOOOOO!!!')
 
 def date_converter(pair_number, day, month, year):
     # создают дату со временем в соответсвии с датой и номера пары
@@ -58,7 +57,7 @@ def check_group(update, group_number):
     driver = webdriver.Edge(service=service, options=options)
     try:
         # Открытие страницы
-        url = "https://rasp.rea.ru/"  # Замените на URL нужного веб-сайта
+        url = "https://rasp.rea.ru/"  
         driver.get(url)
 
         # Нахождение поля ввода номера группы
@@ -82,12 +81,7 @@ def send_schedule(update, group_numbers, chat_id):
     update.message.reply_text("⏳ Downloading...\nIt's just a little bit more")
     driver = webdriver.Edge(service=service, options=options)
     driver.get(current_url)
-    # driver.implicitly_wait(2)
-    # Поиск кнопки по CSS-селектору
-    next_week_button = driver.find_element(By.XPATH, "//button[@class='content weekselbtn']")
-    # Нажатие на кнопку с помощью JavaScript
-    # driver.implicitly_wait(1)
-    driver.execute_script("arguments[0].scrollIntoView(true);", next_week_button)
+
     
     
     # Ожидание загрузки страницы
@@ -95,7 +89,7 @@ def send_schedule(update, group_numbers, chat_id):
     wait.until(EC.presence_of_element_located((By.ID, "zoneTimetable")))  # Здесь указывается локатор элемента, который должен быть видимым перед извлечением содержимого
     # Нахождение элемента <div id="zoneTimetable">
     zoneTimetable = driver.find_element(By.ID, 'zoneTimetable')
-    driver.implicitly_wait(1)
+    # driver.implicitly_wait(1)
     # Нахождение элемента <div class="row"> внутри zoneTimetable
     row = zoneTimetable.find_element(By.CLASS_NAME, 'row')
     # Нахождение элементов <div class="col-lg-6"> внутри row
@@ -225,20 +219,20 @@ def send_n_schedule(update, group_numbers, chat_id):
     update.message.reply_text("⏳ Downloading...\nIt's just a little bit more")
     driver = webdriver.Edge(service=service, options=options)
     driver.get(current_url)
-    driver.implicitly_wait(2)
+    # driver.implicitly_wait(2)
     # Поиск кнопки по CSS-селектору
     next_week_button = driver.find_element(By.XPATH, "//button[@class='content weekselbtn']")
     driver.execute_script("arguments[0].scrollIntoView(true);", next_week_button)
     next_week_button.click()
-    
+    time.sleep(1)
     
     
     # Ожидание загрузки страницы
-    wait = WebDriverWait(driver, 10)  # Установите время ожидания (в секундах) вместо 10, если необходимо
+    wait = WebDriverWait(driver, 2)  # Установите время ожидания (в секундах) вместо 10, если необходимо
     wait.until(EC.presence_of_element_located((By.ID, "zoneTimetable")))  # Здесь указывается локатор элемента, который должен быть видимым перед извлечением содержимого
     # Нахождение элемента <div id="zoneTimetable">
     zoneTimetable = driver.find_element(By.ID, 'zoneTimetable')
-    driver.implicitly_wait(1)
+    # driver.implicitly_wait(1)
     # Нахождение элемента <div class="row"> внутри zoneTimetable
     row = zoneTimetable.find_element(By.CLASS_NAME, 'row')
     # Нахождение элементов <div class="col-lg-6"> внутри row
