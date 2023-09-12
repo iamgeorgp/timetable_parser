@@ -3,7 +3,8 @@ Main Functions for tg bot
 '''
 
 from aiogram import  types
-import dateparser
+import os 
+import re
 
 # F: read tg bot token 
 def read_token(filename):
@@ -11,25 +12,13 @@ def read_token(filename):
     with open(full_file_name, 'r') as file:
         return file.read().strip()
 
-# F: get lesson star&end 
-def date_converter(pair_number, day, month, year):
-    # создают дату со временем в соответсвии с датой и номера пары
-    # возвращает начало и конец пары
-    time_of_pair = {1: [[8, 30], [10, 00]],
-                    2: [[10, 10], [11, 40]],
-                    3: [[11, 50], [13, 20]],
-                    4: [[14, 0], [15, 30]],
-                    5: [[15, 40], [17, 10]],
-                    6: [[17, 20], [18, 50]]
-                    }
-    timing_of_pair = time_of_pair[int(pair_number)]
-    hour_begin = timing_of_pair[0][0]
-    minute_begin = timing_of_pair[0][1]
-    hour_end = timing_of_pair[1][0]
-    minute_end = timing_of_pair[1][1]
-    date_time_str_begin = f"{int(day)} {str(month)} {int(year)} {hour_begin:02d}:{minute_begin:02d}"
-    date_time_str_end = f"{int(day)} {str(month)} {int(year)} {hour_end:02d}:{minute_end:02d}"
-    return dateparser.parse(date_time_str_begin), dateparser.parse(date_time_str_end)
+# F: find .ics by name    
+def find_file_by_name(file_name):
+    # get path to directory
+    file_name = re.sub(r'[/:]', '-', file_name)
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    # full path to database
+    return os.path.join(script_directory, '..', 'group_schedule_ics', 'current_week', file_name + '.ics' )    
 
 # F: hello message markup     
 def hello_message_markup():

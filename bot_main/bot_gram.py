@@ -1,10 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
+# from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
-import pars_func2
 import w_func
-
+import sql_func
 
 API_TOKEN = w_func.read_token(filename='token.txt')
 
@@ -12,14 +11,13 @@ logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-dp.middleware.setup(LoggingMiddleware())
+# dp.middleware.setup(LoggingMiddleware())
 
-# Словарь для хранения состояния пользователей
+# Dictionary for storing user status
 user_state = {}
 user_group = {}
 
-
-# Команда /start
+# Handler for the '/start' command
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     await message.answer("🎓 PRUE Study Buddy can help you add a schedule to your calendar app."
@@ -27,7 +25,8 @@ async def send_welcome(message: types.Message):
                          "Use /help for help notion\nReady to get started?", 
                          reply_markup=w_func.hello_message_markup()
                          )
-
+    
+# Handler for the '/help' command
 @dp.message_handler(commands=['help'])
 async def help_note(message: types.Message):
     await message.answer("Help Notion\n"
@@ -39,34 +38,42 @@ async def help_note(message: types.Message):
                          "`Campus map` - send image of campus\n"
                          )
 
-# Обработчик для кнопки "Меню"
+# Handler for the "Menu" button
 @dp.callback_query_handler(lambda c: c.data == 'menu')
 async def show_menu(call: types.CallbackQuery):
     await call.message.answer("Select:", 
                               reply_markup=w_func.main_menu_buttons_markup())
 
+# Handler for the "Campus map" button
 @dp.message_handler(lambda message: message.text == "Campus map")
 async def show_campus_map(message: types.Message):
     instruction_image_url = "https://www.rea.ru/ru/org/faculties/Fakultet-biznesa-i-dopolnitelnogo-obrazovanija/PublishingImages/%D0%9A%D0%BE%D1%80%D0%BF%D1%83%D1%81%D0%B0%20%D0%A0%D0%AD%D0%A3.JPEG"
     caption = "PRUE map"
     await message.reply_photo(photo=instruction_image_url, caption=caption)
 
+# Handler for the "iOS manual" button
 @dp.message_handler(lambda message: message.text == "iOS manual")
 async def show_ios_manual(message: types.Message):
     await message.answer("Here are the instructions for iOS", 
                          reply_markup=w_func.ios_manual_markup())
-# Обработчик для кнопки "Текущая неделя"
-@dp.message_handler(lambda message: message.text == "Current week")
+
+# Handler for the "Current week schedule" button
+@dp.message_handler(lambda message: message.text == "Current week\nschedule")
 async def show_current_week(message: types.Message):
     user_id = message.from_user.id
     if user_id in user_group:
         group_number = user_group[user_id]
-        await pars_func2.send_schedule(message, user_group, user_id)
+        file_path = w_func.find_file_by_name(group_number)     #   .send_schedule(message, user_group, user_id)
+        await message.answer_document(open(file_path, 'rb'))
     else:
-        message.answer("First, set your group number with the 'Change group' command.")
+        await message.answer("First, set your group number with the 'Change group' command.")
 
+# Handler for the "Reviews of teachers" button
+@dp.message_handler(lambda message: message.text == "Reviews of teachers")
+async def reviews_teachers(message: types.Message):
+    await message.answer("🔧 Feature in development")
 
-# Обработчик для кнопки "Поменять группу"
+# Handler for the "Change group" button
 @dp.message_handler(lambda message: message.text == "Change group")
 @dp.message_handler(commands=['change_group'])
 async def change_group(message: types.Message):
@@ -74,20 +81,18 @@ async def change_group(message: types.Message):
     user_state[user_id] = "awaiting_group"
     await message.answer("Enter the group number.\nFor example:    15.06д-мен03а/21б")
 
-
-# Обработчик ввода группы
+# Group input handler
 @dp.message_handler(lambda message: user_state.get(message.from_user.id) == "awaiting_group")
 async def process_group(message: types.Message):
     user_id = message.from_user.id
-    group = message.text
-    # Проверяем группу с помощью вашей функции check_group
-    valid_group = await pars_func2.check_group(group)
-    if valid_group:
-        user_state.pop(user_id)  # Удаляем состояние пользователя
+    group = message.text.lower()
+    valid_group = sql_func.find_schedule(group)
+    if valid_group != False:
+        user_state.pop(user_id)  # Delete user state
+        user_group[user_id] = group
         await message.answer(f"The group has been successfully selected:\n✅    {group}")
     else:
         await message.answer("❌ Incorrect group entered\nClick the 'Change group' button again")
-
 
 if __name__ == '__main__':
     from aiogram import executor
