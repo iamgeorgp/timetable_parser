@@ -13,12 +13,12 @@ def read_token(filename):
         return file.read().strip()
 
 # F: find .ics by name    
-def find_file_by_name(file_name):
+def find_file_by_name(file_name, type_week):
     # get path to directory
     file_name = re.sub(r'[/:]', '-', file_name)
     script_directory = os.path.dirname(os.path.abspath(__file__))
     # full path to database
-    return os.path.join(script_directory, '..', 'group_schedule_ics', 'current_week', file_name + '.ics' )    
+    return os.path.join(script_directory, '..', 'group_schedule_ics', type_week, file_name + '.ics' )    
 
 # F: hello message markup     
 def hello_message_markup():

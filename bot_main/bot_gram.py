@@ -20,28 +20,30 @@ user_group = {}
 # Handler for the '/start' command
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    await message.answer("🎓 PRUE Study Buddy can help you add a schedule to your calendar app."
+    await message.answer("🎓 <b>PRUE Study Buddy</b>\ncan help you add a schedule to your calendar app.\n"
                          "If you have Android installed, just click on the .ics file to import the schedule. For iOS users, follow the instructions to set up the import.\n"
-                         "Use /help for help notion\nReady to get started?", 
-                         reply_markup=w_func.hello_message_markup()
+                         "Use /help to get assisatnce.\nReady to get started?", 
+                         reply_markup=w_func.hello_message_markup(),
+                         parse_mode=types.ParseMode.HTML
                          )
     
 # Handler for the '/help' command
 @dp.message_handler(commands=['help'])
 async def help_note(message: types.Message):
-    await message.answer("Help Notion\n"
-                         "--Menu--\n"
-                         "`Current week schedule` - send current week schedule in .ics format\n"
-                         "`Next week schedule` - send next week schedule in .ics format\n"
-                         "`Change group` - change your group (use before use .ics commands)\n"
-                         "`iOS manual` -  send link of manual for iOS to connect calendar\n"
-                         "`Campus map` - send image of campus\n"
+    await message.answer("❓ <b>Help Menu</b>\n"
+                         "<u>Current week schedule</u> - send current week schedule in .ics format\n"
+                         "<u>Next week schedule</u> - send next week schedule in .ics format\n"
+                         "<u>Change group</u> - change your group (use before use .ics commands)\n"
+                         "<u>iOS manual</u> -  send link of manual for iOS to connect calendar\n"
+                         "<u>Campus map</u> - send image of campus\n"
+                         "<u>Reviews of teachers</u> - feature in development",
+                         parse_mode=types.ParseMode.HTML
                          )
 
 # Handler for the "Menu" button
 @dp.callback_query_handler(lambda c: c.data == 'menu')
 async def show_menu(call: types.CallbackQuery):
-    await call.message.answer("Select:", 
+    await call.message.answer("Select button:", 
                               reply_markup=w_func.main_menu_buttons_markup())
 
 # Handler for the "Campus map" button
@@ -63,8 +65,19 @@ async def show_current_week(message: types.Message):
     user_id = message.from_user.id
     if user_id in user_group:
         group_number = user_group[user_id]
-        file_path = w_func.find_file_by_name(group_number)     #   .send_schedule(message, user_group, user_id)
-        await message.answer_document(open(file_path, 'rb'))
+        file_path = w_func.find_file_by_name(group_number, 'current_week')     #   .send_schedule(message, user_group, user_id)
+        await message.answer_document(open(file_path, 'rb'), caption='🗓 Your schedule for current week')
+    else:
+        await message.answer("First, set your group number with the 'Change group' command.")
+
+# Handler for the "Next week schedule" button
+@dp.message_handler(lambda message: message.text == "Next week\nschedule")
+async def show_current_week(message: types.Message):
+    user_id = message.from_user.id
+    if user_id in user_group:
+        group_number = user_group[user_id]
+        file_path = w_func.find_file_by_name(group_number, 'next_week')     #   .send_schedule(message, user_group, user_id)
+        await message.answer_document(open(file_path, 'rb'), caption='🗓 Your schedule for next week')
     else:
         await message.answer("First, set your group number with the 'Change group' command.")
 

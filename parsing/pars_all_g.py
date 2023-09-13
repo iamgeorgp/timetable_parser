@@ -80,6 +80,7 @@ def send_current_schedule(driver, url_group, number_group, type_week):
         next_week_button = driver.find_element(By.XPATH, "//button[@class='content weekselbtn']")
         driver.execute_script("arguments[0].scrollIntoView(true);", next_week_button)
         next_week_button.click()
+        time.sleep(3)
     
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.ID, "zoneTimetable")))
@@ -181,12 +182,12 @@ def pars_ics_for_db():
 
     for each_group in result:
         number_currnet_group, url_current_group  = each_group[0], each_group[1]
-        send_current_schedule(driver, url_current_group, number_currnet_group, 'current_week')
-        # send_current_schedule(url_current_group, number_currnet_group, 'next_week')
+        # send_current_schedule(driver, url_current_group, number_currnet_group, 'current_week')
+        send_current_schedule(driver, url_current_group, number_currnet_group, 'next_week')
 
-def del_all_ics():
+def del_all_ics(type_week):
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    folder_path = os.path.join(script_directory, '..', 'group_schedule_ics', 'current_week')
+    folder_path = os.path.join(script_directory, '..', 'group_schedule_ics', type_week)
     files = glob.glob(os.path.join(folder_path, "*"))
     # Удалить каждый файл в папке
     for file in files:
