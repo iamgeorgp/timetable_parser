@@ -35,6 +35,8 @@ PRUE Study Buddy is a Telegram bot designed for students of the Plekhanov Russia
 
 * Users can access the map of the university campus.
 ### Video Example
-Watch this video to see an example of how to use the bot:
+Watch this video to see an example of how to use the bot: `user_example.mp4`
 
-`user_example.mp4`
+
+https://github.com/iamgeorgp/timetable_parser/assets/128215564/924347ed-8d33-4484-af01-7f5103edc02e
+
